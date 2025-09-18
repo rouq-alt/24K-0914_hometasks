@@ -1,0 +1,172 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Node {
+public:
+    int id;
+    string item;
+    int price;
+    Node* prev;
+    Node* next;
+
+    Node(int i, string n, int p) {
+        id = i;
+        item = n;
+        price = p;
+        prev = next = nullptr;
+    }
+};
+
+class Cart {
+private:
+    Node* head;
+    Node* tail;
+
+public:
+    Cart() {
+        head = tail = nullptr;
+    }
+
+    void insertEnd(int id, string item, int price) {
+        Node* newNode = new Node(id, item, price);
+        if (!head) {
+            head = tail = newNode;
+            return;
+        }
+        tail->next = newNode;
+        newNode->prev = tail;
+        tail = newNode;
+    }
+
+    void insertFront(int id, string item, int price) {
+        Node* newNode = new Node(id, item, price);
+        if (!head) {
+            head = tail = newNode;
+            return;
+        }
+        newNode->next = head;
+        head->prev = newNode;
+        head = newNode;
+    }
+
+    void removeFront() {
+        if (!head) return;
+        Node* temp = head;
+        head = head->next;
+        if (head) head->prev = nullptr;
+        else tail = nullptr;
+        delete temp;
+    }
+
+    void removeEnd() {
+        if (!tail) return;
+        Node* temp = tail;
+        tail = tail->prev;
+        if (tail) tail->next = nullptr;
+        else head = nullptr;
+        delete temp;
+    }
+
+    void searchByID(int id) {
+        Node* temp = head;
+        while (temp) {
+            if (temp->id == id) {
+                cout << "Found: " << temp->id << " " << temp->item 
+                     << " " << temp->price << "Rs" << endl;
+                return;
+            }
+            temp = temp->next;
+        }
+        cout << "Item with ID " << id << " not found.\n";
+    }
+
+    void updatePrice(int id, int newPrice) {
+        Node* temp = head;
+        while (temp) {
+            if (temp->id == id) {
+                temp->price = newPrice;
+                cout << "Updated price for " << temp->item 
+                     << " to " << newPrice << "Rs" << endl;
+                return;
+            }
+            temp = temp->next;
+        }
+        cout << "Item with ID " << id << " not found.\n";
+    }
+
+    void displayForward() {
+        Node* temp = head;
+        cout << "Cart (Front to End):\n";
+        while (temp) {
+            cout << temp->id << " " << temp->item 
+                 << " " << temp->price << "Rs" << endl;
+            temp = temp->next;
+        }
+    }
+
+    void displayBackward() {
+        Node* temp = tail;
+        cout << "Cart (End to Front):\n";
+        while (temp) {
+            cout << temp->id << " " << temp->item 
+                 << " " << temp->price << "Rs" << endl;
+            temp = temp->prev;
+        }
+    }
+
+    int countItems() {
+        int count = 0;
+        Node* temp = head;
+        while (temp) {
+            count++;
+            temp = temp->next;
+        }
+        return count;
+    }
+
+    void findMostExpensive() {
+        if (!head) {
+            cout << "Your cart is empty.\n";
+            return;
+        }
+        Node* temp = head;
+        Node* maximum = head;
+        while (temp) {
+            if (temp->price > maximum->price) {
+                maximum = temp;
+            }
+            temp = temp->next;
+        }
+        cout << "Most Expensive: " << maximum->id 
+             << " " << maximum->item 
+             << " " << maximum->price << "Rs" << endl;
+    }
+};
+int main() {
+    Cart cart;
+
+    cart.insertEnd(1, "Laptop", 1000);
+    cart.insertEnd(2, "Phone", 700);
+    cart.insertEnd(3, "Tablet", 400);
+    cart.insertFront(0, "Smartwatch", 200);
+
+    cart.displayForward();
+    cout <<endl;
+    cart.displayBackward();
+
+    cout << "\nTotal Items: " << cart.countItems() << endl;
+
+    cart.searchByID(2);
+    cart.updatePrice(3, 450);
+
+    cart.findMostExpensive();
+
+    cart.removeFront();
+    cart.removeEnd();
+
+    cout << "\nAfter Removals:\n";
+    cart.displayForward();
+
+    return 0;
+}

@@ -1,0 +1,98 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Node {
+public:
+    string item;
+    int price;
+    Node* next;
+
+    Node(string i, int p) {
+        item = i;
+        price = p;
+        next = nullptr;
+    }
+};
+
+
+class ShoppingCart {
+private:
+    Node* head;
+
+public:
+    ShoppingCart() {
+        head = nullptr;
+
+        insertItem("Laptop", 1000);
+        insertItem("Phone", 700);
+        insertItem("Tablet", 400);
+        insertItem("Headphones", 150);
+    }
+
+    void insertFront(string item, int price) {
+        Node* nn = new Node(item, price);
+        nn->next = head;  
+        head = nn;
+    }
+
+    void insertItem(string item, int price) {
+        Node* newNode = new Node(item, price);
+        if (head == nullptr) { 
+            head = newNode;
+            return;
+        }
+        Node* temp =head;
+        while (temp->next != nullptr) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+    }
+
+    void insertAfterItem(string i, string item, int price) {
+        Node* temp = head;
+        while (temp != nullptr && temp->item != i) {
+            temp = temp->next;
+        }
+        if (temp == nullptr)
+         return;
+
+        Node* newNode = new Node(item, price);
+        newNode->next = temp->next;
+        temp->next = newNode;
+    }
+
+    void search(string item) {
+        Node* temp = head;
+        while (temp != nullptr) {
+            if (temp->item == item) {
+                cout <<item << " found"<< temp->price << endl;
+                return;
+            }
+            temp = temp->next;
+        }
+        cout <<item << " not found in cart.\n";
+    }
+
+    void display() {
+        Node* temp =head;
+        while (temp != nullptr) {
+            cout<<temp->item << " Rs" << temp->price <<endl;
+            temp = temp->next;
+        }
+    }
+};
+int main() {
+    ShoppingCart cart; 
+
+    cart.insertFront("Smartwatch", 200);
+    cart.insertItem("Keyboard", 80);
+    cart.insertAfterItem("Phone", "Monitor", 300);
+
+    cart.search("Tablet");
+
+    cout << "\nFinal Cart:\n";
+    cart.display();
+
+    return 0;
+}

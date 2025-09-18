@@ -1,0 +1,180 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Node {
+public:
+    int ticketID;
+    string customer;
+    string ride;
+    Node* next;
+
+    Node(int id, string c, string r) {
+        ticketID = id;
+        customer = c;
+        ride = r;
+        next = nullptr;
+    }
+};
+
+class CircularTicketSystem {
+private:
+    Node* tail;
+
+public:
+    CircularTicketSystem() {
+        tail = nullptr;
+    }
+
+    void issueTicketEnd(int id, string customer, string ride) {
+        Node* newNode = new Node(id, customer, ride);
+        if (!tail) {
+            tail = newNode;
+            tail->next = tail;
+            return;
+        }
+        newNode->next = tail->next;
+        tail->next = newNode;
+        tail = newNode;
+    }
+
+  
+    void issueTicketFront(int id, string customer, string ride) {
+        Node* newNode = new Node(id, customer, ride);
+        if (!tail) {
+            tail = newNode;
+            tail->next = tail;
+            return;
+        }
+        newNode->next = tail->next;
+        tail->next = newNode;
+    }
+
+    void cancelTicket(int id) {
+        if (!tail) {
+            cout << "No tickets booked.\n";
+            return;
+        }
+
+        Node* curr = tail->next;
+        Node* prev = tail;
+
+        do {
+            if (curr->ticketID == id) {
+                if (curr == tail && curr == tail->next) {
+                    delete curr;
+                    tail = nullptr;
+                } else {
+                    prev->next = curr->next;
+                    if (curr == tail) tail = prev;
+                    delete curr;
+                }
+                cout << "Ticket " << id << " cancelled.\n";
+                return;
+            }
+            prev = curr;
+            curr = curr->next;
+        } while (curr != tail->next);
+
+        cout << "Ticket ID " << id << " not found.\n";
+    }
+
+    void cancelFirst() {
+        if (!tail) {
+            cout << "No tickets booked.\n";
+            return;
+        }
+        Node* head = tail->next;
+        if (head == tail) {
+            delete head;
+            tail = nullptr;
+        } else {
+            tail->next = head->next;
+            delete head;
+        }
+        cout << "First ticket cancelled.\n";
+    }
+
+    void searchTicket(int id) {
+        if (!tail) {
+            cout << "No tickets booked.\n";
+            return;
+        }
+        Node* temp = tail->next;
+        do {
+            if (temp->ticketID == id) {
+                cout << "Ticket Found: ID " << temp->ticketID
+                     << ", Customer: " << temp->customer
+                     << ", Ride: " << temp->ride << endl;
+                return;
+            }
+            temp = temp->next;
+        } while (temp != tail->next);
+
+        cout << "Ticket with ID " << id << " not found.\n";
+    }
+
+
+    void displayTickets() {
+        if (!tail) {
+            cout << "No tickets booked.\n";
+            return;
+        }
+        Node* temp = tail->next;
+        cout << "Tickets in Circular Order:\n";
+        do {
+            cout << "ID: " << temp->ticketID << " | Customer: " << temp->customer 
+                 << " | Ride: " << temp->ride << endl;
+            temp = temp->next;
+        } while (temp != tail->next);
+    }
+
+    int countTickets() {
+        if (!tail) return 0;
+        int count = 0;
+        Node* temp = tail->next;
+        do {
+            count++;
+            temp = temp->next;
+        } while (temp != tail->next);
+        return count;
+    }
+
+    void findNextTicket(int id) {
+        if (!tail) {
+            cout << "No tickets booked.\n";
+            return;
+        }
+        Node* temp = tail->next;
+        do {
+            if (temp->ticketID == id) {
+                cout << "Next Ticket after ID " << id << ": ";
+                cout << "ID: " << temp->next->ticketID << " | Customer: " 
+                     << temp->next->customer << " | Ride: " << temp->next->ride << endl;
+                return;
+            }
+            temp = temp->next;
+        } while (temp != tail->next);
+
+        cout << "Ticket ID " << id << " not found.\n";
+    }
+};
+int main() {
+    CircularTicketSystem system;
+
+    system.issueTicketEnd(1, "Shorouq", "RollerCoaster");
+    system.issueTicketEnd(2, "Sara", "carousel");
+    system.issueTicketFront(0, "Nomra", "HauntedHouse");
+
+
+    system.displayTickets();
+    cout << "Total Tickets: " << system.countTickets() << endl;
+    system.searchTicket(2);
+    system.findNextTicket(1);
+    system.cancelFirst();
+    system.displayTickets();
+    system.cancelTicket(2);
+    system.displayTickets();
+
+    return 0;
+}
